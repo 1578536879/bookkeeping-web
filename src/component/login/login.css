@@ -1,0 +1,10 @@
+.login{
+    width: 80%;
+    margin: auto;
+    transform: translateY(50px);
+}
+
+.password{
+    margin-bottom: 15px;
+    margin-top: 15px;
+}
