@@ -14,20 +14,26 @@ export default class Login extends Component{
         this.login = this.login.bind(this)
     }
 
-    emailChange(e){
+    emailChange = (e) =>{
         this.setState({
             email: e.target.value
         })
     }
 
-    passwordChange(e){
+    passwordChange = (e) =>{
         this.setState({
             password: e.target.value
         })
     }
 
     login(){
-        console.log(this.state)
+        console.log(this.props)
+        this.props.history.push({
+            pathname: '/home',
+            query: {
+                data: '123124'
+            }
+        })
     }
 
     render(){
