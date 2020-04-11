@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
 import './home.css'
-import {Menu, Dropdown, Row, Col, Avatar,Popover} from 'antd'
-import {DownOutlined } from '@ant-design/icons'
+import {Menu, Dropdown, Row, Col, Avatar,Popover, Table, Button} from 'antd'
+import {DownOutlined, PlusOutlined } from '@ant-design/icons'
+// import Column from 'antd/lib/table/Column'
 
 class Home extends Component{
     constructor(props){
@@ -12,7 +13,40 @@ class Home extends Component{
             groups: '',
             onShow: '个人',
             visible: false,
-            content: ''
+            content: '',
+            columns: [{
+                title: '账单内容',
+                dataIndex: 'content'
+            },{
+                title: '账单金额',
+                dataIndex: 'price'
+            },{
+                title: '账单日期',
+                dataIndex: 'date'
+            },{
+                title: '账单记录人',
+                dataIndex: 'name'
+            },{
+                title: '账单操作',
+                dataIndex: 'other',
+                render: (content) =>(
+                    <span className='group-col'>
+                        <a onClick={this.picture.bind(this, content)}>{content.picture}</a>&nbsp;&nbsp;
+                        <a onClick={this.delete.bind(this, content)}>删除</a>
+                    </span>
+                )
+            }],
+            data: [{
+                key: 1,
+                content: '午餐',
+                price: '12.1',
+                date: '2020/4/10 12:59',
+                name: 'my',
+                other: {
+                    picture: '查看',
+                    BKID: '124321523465745543123'
+                }
+            }]
         }
     }
 
@@ -56,6 +90,14 @@ class Home extends Component{
         this.setState({ visible });
     }    
 
+    picture = (e) => {
+        console.log(e)
+    }
+
+    delete = (e) => {
+        console.log(e)
+    }
+
     render(){
         console.log(this.state.groups)
         return (
@@ -73,7 +115,13 @@ class Home extends Component{
                     </Col>
                 </Row>
                 <Row>
-
+                    <Col span={22} className='add-col'>
+                        <Button type='primary' icon={<PlusOutlined />}>添加账单</Button>
+                    </Col>
+                    <Col span={22} className='table-col'>
+                        <Table columns={this.state.columns} dataSource={this.state.data}>
+                        </Table>
+                    </Col>
                 </Row>
             </div>
         )

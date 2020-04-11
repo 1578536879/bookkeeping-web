@@ -8,6 +8,7 @@ page{
     height: 50px;
     line-height: 40px;
     padding-left: 10%;
+    margin-bottom: 15px;
 }
 
 .groups-col{
@@ -36,4 +37,16 @@ page{
 
 .choose{
     cursor: pointer;
+}
+
+.table-col{
+    margin: auto;
+}
+
+.add-col{
+    margin-bottom: 10px;
+}
+
+.add-col button{
+    float: right;
 }
