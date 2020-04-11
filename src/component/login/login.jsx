@@ -1,8 +1,10 @@
 import React, { Component } from "react";
-import {Input, Button} from 'antd'
+import {Input, Button, Form} from 'antd'
+import {LockOutlined, MailOutlined} from '@ant-design/icons'
+import {withRouter} from 'react-router-dom'
 import './login.css'
 
-export default class Login extends Component{
+class Login extends Component{
     constructor(props){
         super(props)
         this.state = {
@@ -38,12 +40,27 @@ export default class Login extends Component{
 
     render(){
         return (
-            <div className="login">
-                <Input placeholder="请输入邮箱" value={this.state.email} size="middle" onChange={this.emailChange}/>
-                <Input.Password placeholder="请输入密码"  value={this.state.password} className="password" size="middle" onChange={this.passwordChange}/>
-                <Button type="primary" block onClick={this.login}>登 陆</Button>
-            </div>
-          
+            <Form className='login' style={{margin: 'auto'}}>
+                <Form.Item name='email' rules={[{
+                    required: true,
+                    pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+                    message: '邮箱格式错误'
+                }]}>
+                    <Input prefix={<MailOutlined />} placeholder='请输入邮箱' value={this.state.email}></Input>
+                </Form.Item>
+                <Form.Item name="password">
+                    <Input.Password prefix={<LockOutlined/>}  type="password" placeholder="请输入密码" value={this.state.password} />
+                </Form.Item>
+                <Form.Item>
+                    <a className="login-form-forgot" href="">忘记密码</a>
+                </Form.Item>
+
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.login}>登陆</Button>
+                </Form.Item>
+            </Form>
         )
     }
 }
+
+export default withRouter(Login)

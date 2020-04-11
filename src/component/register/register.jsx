@@ -1,5 +1,6 @@
 import React, { Component } from "react";
-import {Input, Button} from 'antd'
+import {Input, Button, Form} from 'antd'
+import {LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import './register.css'
 
 export default class Register extends Component{
@@ -9,6 +10,7 @@ export default class Register extends Component{
             email: '',
             password: '',
             code: '',
+            username: '',
             codeBnt: 'primary',
             codeStyle: {
                 width: '55%',
@@ -36,20 +38,35 @@ export default class Register extends Component{
         })
     }
 
-    login(){
+    register(){
         console.log(this.state)
     }
 
     render(){
         return (
-            <div className="regiser">
-                <Input placeholder="请输入用户名" value={this.state.email} size="middle" onChange={this.emailChange}/>
-                <Input.Password placeholder="请输入密码"  value={this.state.password} className="password" size="middle" onChange={this.passwordChange}/>
-                <Input placeholder="请输入验证码" value={this.state.code} style={this.state.codeStyle}/>
-                <Button type={this.state.codeBnt} className="codeBnt">获取验证码</Button>
-                <Button type="primary" block onClick={this.login}>登 陆</Button>
-            </div>
-          
+            <Form className='register' style={{margin: 'auto'}}>
+                <Form.Item name='email' rules={[{
+                    required: true,
+                    pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+                    message: '邮箱格式错误'
+                }]} style={{marginBottom: '10px'}}>
+                    <Input prefix={<MailOutlined />} placeholder='请输入邮箱' value={this.state.email}></Input>
+                </Form.Item>
+                <Form.Item style={{marginBottom: '10px'}}>
+                    <Input prefix={<UserOutlined />}  type="password" placeholder="请输入用户名" value={this.state.username} />
+                </Form.Item>
+                <Form.Item name="password" style={{marginBottom: '10px'}}>
+                    <Input.Password prefix={<LockOutlined/>}  type="password" placeholder="请输入密码" value={this.state.password} />
+                </Form.Item>
+
+                <Form.Item style={{marginBottom: '10px'}}>
+                    <Input value={this.state.code} placeholder='验证码' style={{width: '53%', marginRight: '5%',}}></Input>
+                    <Button type="primary" className='codeBnt'>获取验证码</Button>
+                </Form.Item>
+                <Form.Item>
+                    <Button type="primary" htmlType="submit" onClick={this.register} block>注册</Button>
+                </Form.Item>
+            </Form>
         )
     }
 }
