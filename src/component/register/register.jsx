@@ -44,7 +44,7 @@ export default class Register extends Component{
 
     render(){
         return (
-            <Form className='register' style={{margin: 'auto'}}>
+            <Form className='register' style={{margin: 'auto'}} onClick={this.register} >
                 <Form.Item name='email' rules={[{
                     required: true,
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
@@ -64,7 +64,7 @@ export default class Register extends Component{
                     <Button type="primary" className='codeBnt'>获取验证码</Button>
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" onClick={this.register} block>注册</Button>
+                    <Button type="primary" htmlType="submit" block>注册</Button>
                 </Form.Item>
             </Form>
         )

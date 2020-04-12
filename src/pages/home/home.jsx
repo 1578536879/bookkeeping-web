@@ -1,13 +1,12 @@
 import React, {Component} from 'react'
 import './home.css'
-import {Menu, Dropdown, Row, Col, Avatar,Popover, Table, Button} from 'antd'
+import {Menu, Dropdown, Row, Col, Avatar,Popover, Table, Button, Modal} from 'antd'
 import {DownOutlined, PlusOutlined } from '@ant-design/icons'
-// import Column from 'antd/lib/table/Column'
+import AddBill from '../../component/addBill/addBill'
 
 class Home extends Component{
     constructor(props){
         super(props)
-        // eslint-disable-next-line no-this-before-super
         this.state = {
             userID: '12321342342314',
             groups: '',
@@ -30,9 +29,9 @@ class Home extends Component{
                 title: '账单操作',
                 dataIndex: 'other',
                 render: (content) =>(
-                    <span className='group-col'>
-                        <a onClick={this.picture.bind(this, content)}>{content.picture}</a>&nbsp;&nbsp;
-                        <a onClick={this.delete.bind(this, content)}>删除</a>
+                    <span>
+                        <span className='other' onClick={this.picture.bind(this, content)}>{content.picture}</span>&nbsp;&nbsp;
+                        <span className='other' onClick={this.delete.bind(this, content)}>删除</span>
                     </span>
                 )
             }],
@@ -46,7 +45,8 @@ class Home extends Component{
                     picture: '查看',
                     BKID: '124321523465745543123'
                 }
-            }]
+            }],
+            modalVisible: true
         }
     }
 
@@ -98,6 +98,24 @@ class Home extends Component{
         console.log(e)
     }
 
+    addBK = () => {
+        this.setState({
+            modalVisible: true
+        })
+    }
+
+    closeBK = () => {
+        this.setState({
+            modalVisible: false
+        })
+    }
+
+    onFinish = () => {
+        this.setState({
+            modalVisible: false
+        })
+    }
+
     render(){
         console.log(this.state.groups)
         return (
@@ -109,20 +127,23 @@ class Home extends Component{
                         </Dropdown>
                     </Col>
                     <Col span={12} className='avater-col'>
-                        <Popover content={<a onClick={this.hide}>Close</a>} trigger="click" visible={this.state.visible} onVisibleChange={this.handleVisibleChange} content={this.state.content}>
+                        <Popover trigger="click" visible={this.state.visible} onVisibleChange={this.handleVisibleChange} content={this.state.content}>
                             <Avatar className='avater' src="https://zos.alipayobjects.com/rmsportal/ODTLcjxAfvqbxHnVXCYX.png">U</Avatar>
                         </Popover>
                     </Col>
                 </Row>
                 <Row>
                     <Col span={22} className='add-col'>
-                        <Button type='primary' icon={<PlusOutlined />}>添加账单</Button>
+                        <Button type='primary' icon={<PlusOutlined />} onClick={this.addBK}>添加账单</Button>
                     </Col>
                     <Col span={22} className='table-col'>
                         <Table columns={this.state.columns} dataSource={this.state.data}>
                         </Table>
                     </Col>
                 </Row>
+                <Modal title="添加账单信息" visible={this.state.modalVisible} onOk={this.handleOk} style={{width: '95%',margin: 'auto'}} footer={null} onCancel={this.closeBK}>
+                    <AddBill onFinish={this.onFinish}/>
+                </Modal>
             </div>
         )
     }

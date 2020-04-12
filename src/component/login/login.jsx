@@ -40,7 +40,7 @@ class Login extends Component{
 
     render(){
         return (
-            <Form className='login' style={{margin: 'auto'}}>
+            <Form className='login' style={{margin: 'auto'}} onClick={this.login}>
                 <Form.Item name='email' rules={[{
                     required: true,
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
@@ -51,12 +51,12 @@ class Login extends Component{
                 <Form.Item name="password">
                     <Input.Password prefix={<LockOutlined/>}  type="password" placeholder="请输入密码" value={this.state.password} />
                 </Form.Item>
-                <Form.Item>
-                    <a className="login-form-forgot" href="">忘记密码</a>
+                <Form.Item  className='forget'>
+                    <span className="login-form-forgot">忘记密码</span>
                 </Form.Item>
 
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" className="login-form-button" onClick={this.login}>登陆</Button>
+                    <Button type="primary" htmlType="submit" className="login-form-button" >登陆</Button>
                 </Form.Item>
             </Form>
         )
