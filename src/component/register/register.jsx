@@ -4,6 +4,7 @@ import {LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import './register.css'
 import Axios from 'axios'
 import qs from 'qs'
+import commonData from '../../common/DATA'
 import enviorment from '../../common/enviornment'
 import md5 from 'js-md5'
 
@@ -101,6 +102,11 @@ export default class Register extends Component{
             },
         }).then(res=>{
             console.log(res)
+            if(res.data.code === commonData.CODE.SUCCESS){
+                message.success('注册成功')
+            }else{
+                message.error(res.data.msg)
+            }
         })
     }
 

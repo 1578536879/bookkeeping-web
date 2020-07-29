@@ -1,7 +1,8 @@
 import React, {Component} from 'react'
 import './home.css'
-import {Menu, Dropdown, Row, Col, Avatar,Popover, Table, Button, Modal} from 'antd'
-import {DownOutlined, PlusOutlined } from '@ant-design/icons'
+import {Menu, Dropdown, Row, Col, Avatar,Popover, Table, Button, Modal, icon} from 'antd'
+import {DownOutlined, PlusOutlined, TeamOutlined, UserOutlined, PlusCircleOutlined} from '@ant-design/icons'
+import CreateGroupComponent from '../../component/createGroup/createGroup'
 import AddBill from '../../component/addBill/addBill'
 
 class Home extends Component{
@@ -12,6 +13,7 @@ class Home extends Component{
             groups: '',
             onShow: '个人',
             visible: false,
+            createGroupVisible: false,
             content: '',
             columns: [{
                 title: '账单内容',
@@ -46,20 +48,24 @@ class Home extends Component{
                     BKID: '124321523465745543123'
                 }
             }],
-            modalVisible: true
+            modalVisible: false,
+            groups: []
         }
     }
 
     componentDidMount(){
         console.log(1232)
-        let data = ['个人', 'test', 'test1'];
         // eslint-disable-next-line react/no-direct-mutation-state
         let buffer = []
-        data.forEach(ele=>{
+        buffer.push(<Menu.Item key="person"><UserOutlined />个人</Menu.Item>)
+        this.state.groups.forEach((ele, index)=>{
             // eslint-disable-next-line react/react-in-jsx-scope
-            buffer.push(<Menu.Item key={ele}>{ele}</Menu.Item>)
+            buffer.push(<Menu.Divider></Menu.Divider>)
+            buffer.push(<Menu.Item key={index} ><TeamOutlined />{ele}</Menu.Item>)
             console.log(buffer)
         })
+        buffer.push(<Menu.Divider></Menu.Divider>)
+        buffer.push(<Menu.Item key='add' ><PlusCircleOutlined />新建组</Menu.Item>)
         this.setState({
             groups: (<Menu onClick={this.handleMenuClick} className='menu'>
                         {buffer}
@@ -73,11 +79,24 @@ class Home extends Component{
         })
     }
 
-    handleMenuClick(e){
+    
+
+    handleMenuClick = (e) => {
         console.log(e)
-        this.setState({
-            onShow: e.key
-        })
+        if(e.key === 'person'){
+            this.setState({
+                onShow: '个人'
+            })
+        }else if(e.key === 'add'){
+            this.setState({
+                createGroupVisible: true
+            })
+        }else{
+            let groupName = this.state.groups[e.key]
+            this.setState({
+                onShow: groupName
+            })
+        }
     }
 
     hide = () => {
@@ -116,14 +135,26 @@ class Home extends Component{
         })
     }
 
+    onCreateGroupFinish = () =>{
+        this.setState({
+            createGroupVisible: false
+        })
+    }
+
+    closeCreateGroup = () =>{
+        this.setState({
+            createGroupVisible: false
+        })
+    }
+
     render(){
         console.log(this.state.groups)
         return (
             <div>
                 <Row className='header'>
                     <Col span={12} className='groups-col'>
-                        <Dropdown overlay={this.state.groups} trigger={['click']}>
-                            <span>{this.state.onShow}&nbsp;&nbsp;&nbsp;<DownOutlined className='group-col'/></span>
+                        <Dropdown overlay={this.state.groups} trigger={['click']} >
+                            <span>{this.state.onShow}&nbsp;&nbsp;<DownOutlined className='group-col'/></span>
                         </Dropdown>
                     </Col>
                     <Col span={12} className='avater-col'>
@@ -143,6 +174,9 @@ class Home extends Component{
                 </Row>
                 <Modal title="添加账单信息" visible={this.state.modalVisible} onOk={this.handleOk} style={{width: '95%',margin: 'auto'}} footer={null} onCancel={this.closeBK}>
                     <AddBill onFinish={this.onFinish}/>
+                </Modal>
+                <Modal title="添加组" visible={this.state.createGroupVisible} footer={null} onCancel={this.closeCreateGroup}>
+                    <CreateGroupComponent onCreateGroupFinish={this.onCreateGroupFinish}/>
                 </Modal>
             </div>
         )

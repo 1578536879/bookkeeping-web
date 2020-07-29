@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import {Input, Button, Form} from 'antd'
+import {Input, Button, Form, message} from 'antd'
 import {LockOutlined, MailOutlined} from '@ant-design/icons'
 import {withRouter} from 'react-router-dom'
 import './login.css'
@@ -7,6 +7,7 @@ import Axios from 'axios'
 import qs from 'qs'
 import enviornment from '../../common/enviornment'
 import md5 from 'js-md5'
+import commonData from '../../common/DATA'
 
 class Login extends Component{
     constructor(props){
@@ -17,7 +18,6 @@ class Login extends Component{
         }
         this.login = this.login.bind(this)
     }
-
 
     login(){
         let that = this
@@ -42,11 +42,13 @@ class Login extends Component{
             },
         }).then(res => {
             console.log(res)
-            localStorage.setItem("token", res.data.data.token)
-            if(res.data.code === 200){
+            if(res.data.code === commonData.CODE.SUCCESS){
+                localStorage.setItem("token", res.data.data.token)
                 this.props.history.push({
-                    pathname: '/test',
+                    pathname: '/home',
                 })
+            }else{
+                message.error(res.data.data.msg)
             }
             
         }).catch(err=>{

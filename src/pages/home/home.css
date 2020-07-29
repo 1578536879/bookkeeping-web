@@ -18,6 +18,7 @@ page{
 
 .groups-col span{
     cursor: pointer;
+    transform: scaleX(1.2);
 }
 
 .avater-col{
