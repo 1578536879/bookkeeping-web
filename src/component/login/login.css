@@ -8,6 +8,10 @@
     float: right;
 }
 
+.login-form-forgot:hover{
+    color: deepskyblue;
+}
+
 .forget{
     color: deepskyblue;
     cursor: pointer;

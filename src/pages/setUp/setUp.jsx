@@ -12,30 +12,7 @@ class setUp extends Component{
     constructor(props){
         super(props)
         this.state = {
-            columns: [{
-                title: '组名',
-                dataIndex: 'name',
-                key: 'name'
-            },{
-                title: '操作',
-                dataIndex: 'action',
-                key: 'action',
-                render: action => (
-                    <div key='action'>
-                        {
-                            action.using && <span data={action.GID}  style={{color: 'red', cursor: 'pointer'}} onClick={this.stopUsingGroup.bind(this, action.GID)}>停用</span>
-                        }{
-                            !action.using && <span data={action.GID}  style={{color: 'green', cursor: 'pointer'}} onClick={this.usingGroup.bind(this, action.GID)}>启用</span>
-                        }
-                        {
-                            action.using && <span style={{fontSize: '16px'}}>|</span>
-                        }
-                        {
-                            action.using && <span  style={{color: '#1890FF', cursor: 'pointer'}} onClick={this.rename.bind(action.GID).bind(this, action.GID)}>重命名</span>
-                        }
-                    </div>
-                )
-            }],
+            columns: commonData.TABLECOLUMS.SETUP,
             data: [],
             resetPassword: false,
             renameFlag: false,
@@ -47,6 +24,26 @@ class setUp extends Component{
 
     componentDidMount(){
         let that = this
+        that.state.columns.push({
+            title: '操作',
+            dataIndex: 'action',
+            key: 'action',
+            render: action => (
+                <div key='action'>
+                    {
+                        action.using && <span data={action.GID}  style={{color: 'red', cursor: 'pointer'}} onClick={this.stopUsingGroup.bind(this, action.GID)}>停用</span>
+                    }{
+                        !action.using && <span data={action.GID}  style={{color: 'green', cursor: 'pointer'}} onClick={this.usingGroup.bind(this, action.GID)}>启用</span>
+                    }
+                    {
+                        action.using && <span style={{fontSize: '16px'}}>|</span>
+                    }
+                    {
+                        action.using && <span  style={{color: '#1890FF', cursor: 'pointer'}} onClick={this.rename.bind(action.GID).bind(this, action.GID)}>重命名</span>
+                    }
+                </div>
+            )
+        })
         getUserCreateGroup({
             token: localStorage.getItem('token')
         }).then(res=>{

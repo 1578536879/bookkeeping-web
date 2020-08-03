@@ -2,16 +2,14 @@ import React, { Component } from "react";
 import {Input, Button, Form, message} from 'antd'
 import {LockOutlined, MailOutlined, UserOutlined } from '@ant-design/icons'
 import './register.css'
-import Axios from 'axios'
-import qs from 'qs'
 import commonData from '../../common/DATA'
-import enviorment from '../../common/enviornment'
 import {register} from '../../interface/user'
+import {getRegisterCode} from '../../interface/code'
 
 export default class Register extends Component{
     constructor(props){
         super(props)
-        this.register = this.register.bind(this)
+        this.onFinish = this.onFinish.bind(this)
         this.getCode = this.getCode.bind(this)
         this.state = {
             email: '',
@@ -29,12 +27,7 @@ export default class Register extends Component{
     }
 
     getCode = (e) =>{
-        console.log(enviorment)
         let email = this.refs.email.props.value || this.refs.email.state.value
-        if(!email){
-            message.error('请输入您的邮箱地址!')
-            return 
-        }
         this.setState({
             email: email
         })
@@ -57,19 +50,14 @@ export default class Register extends Component{
             codeDisabled: true,
             codeMsg: second + "s后重新获取"
         })
-        Axios({
-            method: 'post',
-            url: `http://${enviorment.hostname}:${enviorment.port}/getRegisterCode`,
-            data: qs.stringify({
-                email: email
-            }),
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-            },
+        getRegisterCode({
+            email: email
         }).then(res=>{
             console.log(res)
-            if(res.data.code === 200){
+            if(res.data.code === commonData.CODE.SUCCESS){
                 message.success('验证码发送成功，请到邮箱查看~')
+            }else{
+                message.error(res.data.msg)
             }
         })
     }
@@ -77,13 +65,13 @@ export default class Register extends Component{
     onFinish(){
         console.log(this.state)
         let password = this.refs.password.props.value || this.refs.password.state.value
+        let that = this
         this.setState({
             password: password,
             email: that.refs.email.props.value || that.refs.email.state.value,
             username: that.refs.username.props.value || that.refs.username.state.value,
             code: that.refs.code.props.value || that.refs.code.state.value
         })
-        let that = this
         register({
             email: that.state.email,
             password: that.state.password,
@@ -93,6 +81,7 @@ export default class Register extends Component{
             console.log(res)
             if(res.data.code === commonData.CODE.SUCCESS){
                 message.success('注册成功')
+                that.props.registerSuccess()
             }else{
                 message.error(res.data.msg)
             }

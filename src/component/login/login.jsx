@@ -14,6 +14,7 @@ class Login extends Component{
             password: ''
         }
         this.onFinish = this.onFinish.bind(this)
+        this.forgetPassword = this.forgetPassword.bind(this)
     }
 
     onFinish(){
@@ -43,6 +44,10 @@ class Login extends Component{
        
     }
 
+    forgetPassword(){
+        this.props.forgetPassword()
+    }
+
     render(){
         return (
             <Form className='login' style={{margin: 'auto'}} onFinish={this.onFinish}>
@@ -57,7 +62,7 @@ class Login extends Component{
                     <Input.Password prefix={<LockOutlined/>}  type="password" placeholder="请输入密码" value={this.state.password}  ref="password"/>
                 </Form.Item>
                 <Form.Item  className='forget'>
-                    <span className="login-form-forgot">忘记密码</span>
+                    <span className="login-form-forgot" onClick={this.forgetPassword}>忘记密码</span>
                 </Form.Item>
 
                 <Form.Item>

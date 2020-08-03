@@ -11,6 +11,7 @@ class App extends Component {
     this.state = {
       current: 'login'
     }
+    this.registerSuccess = this.registerSuccess.bind(this)
     // this.handleClick = this.handleClick.bind(this)
   }
 
@@ -18,6 +19,18 @@ class App extends Component {
     console.log(e)
     this.setState({
       current: e.key
+    })
+  }
+
+  forgetPassword = () =>{
+    this.props.history.push({
+      pathname: '/forget-password',
+    })
+  }
+
+  registerSuccess(){
+    this.setState({
+      current: 'login'
     })
   }
 
@@ -32,7 +45,7 @@ class App extends Component {
             注册
           </Menu.Item>
         </Menu>
-        {this.state.current === "login"?<Login></Login>:<Register></Register>}
+        {this.state.current === "login"?<Login forgetPassword={this.forgetPassword}></Login>:<Register registerSuccess={this.registerSuccess}></Register>}
         
       </div>
     );

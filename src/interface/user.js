@@ -56,3 +56,20 @@ export let resetPassword = function(data){
     })
 }
 
+export let forgetPassword = function(data){
+    let res = encryption({password: data.password})
+    return Axios({
+        method: 'post',
+        url: `http://${enviornment.hostname}:${enviornment.port}/user/forgetPassword`,
+        data: qs.stringify({
+            email: data.email,
+            code: data.code,
+            password: res.password,
+            pos: res.pos
+        }),
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+        },
+    })
+}
+

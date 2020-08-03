@@ -1,10 +1,11 @@
 import React, {Component} from 'react'
 import './home.css'
-import {Menu, Dropdown, Row, Col, Avatar,Popover, Table, Button, Modal, icon} from 'antd'
+import {Menu, Dropdown, Row, Col, Avatar,Popover, Table, Button, Modal, message} from 'antd'
 import {DownOutlined, PlusOutlined, TeamOutlined, UserOutlined, PlusCircleOutlined} from '@ant-design/icons'
 import CreateGroupComponent from '../../component/createGroup/createGroup'
 import AddBill from '../../component/addBill/addBill'
 import {getUserCreateGroup} from '../../interface/userGroup'
+import commonData from '../../common/DATA'
 
 class Home extends Component{
     constructor(props){
@@ -16,28 +17,7 @@ class Home extends Component{
             visible: false,
             createGroupVisible: false,
             content: '',
-            columns: [{
-                title: '账单内容',
-                dataIndex: 'content'
-            },{
-                title: '账单金额',
-                dataIndex: 'price'
-            },{
-                title: '账单日期',
-                dataIndex: 'date'
-            },{
-                title: '账单记录人',
-                dataIndex: 'name'
-            },{
-                title: '账单操作',
-                dataIndex: 'other',
-                render: (content) =>(
-                    <span>
-                        <span className='other' onClick={this.picture.bind(this, content)}>{content.picture}</span>&nbsp;&nbsp;
-                        <span className='other' onClick={this.delete.bind(this, content)}>删除</span>
-                    </span>
-                )
-            }],
+            columns: commonData.TABLECOLUMS.HOME,
             data: [{
                 key: 1,
                 content: '午餐',
@@ -52,16 +32,27 @@ class Home extends Component{
             modalVisible: false,
             groups: []
         }
+        this.logout = this.logout.bind(this)
     }
 
     personSetting = ()=>{
         this.props.history.push({
-            pathname: '/setUp',
+            pathname: '/set-up',
         })
     }
 
     componentDidMount(){
         // eslint-disable-next-line react/no-direct-mutation-state
+        this.state.columns.push({
+            title: '账单操作',
+            dataIndex: 'other',
+            render: (content) =>(
+                <span>
+                    <span className='other' onClick={this.picture.bind(this, content)}>{content.picture}</span>&nbsp;&nbsp;
+                    <span className='other' onClick={this.delete.bind(this, content)}>删除</span>
+                </span>
+            )
+        })
         let that = this
         let buffer = []
         buffer.push(<Menu.Item key="person"><UserOutlined />个人</Menu.Item>)
@@ -69,26 +60,30 @@ class Home extends Component{
             token: localStorage.getItem('token')
         }).then(res=>{
             console.log(res)
-            res.data.data.groupsName.forEach((ele, index)=>{
-                // eslint-disable-next-line react/react-in-jsx-scope
+            if(res.data.code === commonData.CODE.SUCCESS){
+                res.data.data.groupsName.forEach((ele, index)=>{
+                    // eslint-disable-next-line react/react-in-jsx-scope
+                    buffer.push(<Menu.Divider></Menu.Divider>)
+                    buffer.push(<Menu.Item key={ele.index} ><TeamOutlined />{ele.name}</Menu.Item>)
+                    console.log(buffer)
+                })
                 buffer.push(<Menu.Divider></Menu.Divider>)
-                buffer.push(<Menu.Item key={ele.index} ><TeamOutlined />{ele.name}</Menu.Item>)
-                console.log(buffer)
-            })
-            buffer.push(<Menu.Divider></Menu.Divider>)
-            buffer.push(<Menu.Item key='add' ><PlusCircleOutlined />新建组</Menu.Item>)
-            that.setState({
-                groups: (<Menu onClick={that.handleMenuClick} className='menu'>
-                            {buffer}
-                        </Menu>),
-                content: (
-                    <div>
-                        <p className='choose' onClick={this.personSetting}>个人设置</p>
-                        <p className='choose'>退出登录</p>
-                    </div>
-                )
-            })
-            localStorage.setItem('token', res.data.data.token)
+                buffer.push(<Menu.Item key='add' ><PlusCircleOutlined />新建组</Menu.Item>)
+                that.setState({
+                    groups: (<Menu onClick={that.handleMenuClick} className='menu'>
+                                {buffer}
+                            </Menu>),
+                    content: (
+                        <div>
+                            <p className='choose' onClick={this.personSetting}>个人设置</p>
+                            <p className='choose' onClick={this.logout}>退出登录</p>
+                        </div>
+                    )
+                })
+                localStorage.setItem('token', res.data.data.token)
+            }else{
+                message.error(res.data.msg)
+            }
         })
        
     }
@@ -117,6 +112,13 @@ class Home extends Component{
         this.setState({
           visible: false,
         });
+    }
+
+    logout(){
+        localStorage.removeItem('token')
+        this.props.history.push({
+            pathname: '/'
+        })
     }
 
     handleVisibleChange = visible => {
