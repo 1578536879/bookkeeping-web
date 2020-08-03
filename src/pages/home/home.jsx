@@ -4,6 +4,7 @@ import {Menu, Dropdown, Row, Col, Avatar,Popover, Table, Button, Modal, icon} fr
 import {DownOutlined, PlusOutlined, TeamOutlined, UserOutlined, PlusCircleOutlined} from '@ant-design/icons'
 import CreateGroupComponent from '../../component/createGroup/createGroup'
 import AddBill from '../../component/addBill/addBill'
+import {getUserCreateGroup} from '../../interface/userGroup'
 
 class Home extends Component{
     constructor(props){
@@ -53,30 +54,43 @@ class Home extends Component{
         }
     }
 
+    personSetting = ()=>{
+        this.props.history.push({
+            pathname: '/setUp',
+        })
+    }
+
     componentDidMount(){
-        console.log(1232)
         // eslint-disable-next-line react/no-direct-mutation-state
+        let that = this
         let buffer = []
         buffer.push(<Menu.Item key="person"><UserOutlined />个人</Menu.Item>)
-        this.state.groups.forEach((ele, index)=>{
-            // eslint-disable-next-line react/react-in-jsx-scope
+        getUserCreateGroup({
+            token: localStorage.getItem('token')
+        }).then(res=>{
+            console.log(res)
+            res.data.data.groupsName.forEach((ele, index)=>{
+                // eslint-disable-next-line react/react-in-jsx-scope
+                buffer.push(<Menu.Divider></Menu.Divider>)
+                buffer.push(<Menu.Item key={ele.index} ><TeamOutlined />{ele.name}</Menu.Item>)
+                console.log(buffer)
+            })
             buffer.push(<Menu.Divider></Menu.Divider>)
-            buffer.push(<Menu.Item key={index} ><TeamOutlined />{ele}</Menu.Item>)
-            console.log(buffer)
+            buffer.push(<Menu.Item key='add' ><PlusCircleOutlined />新建组</Menu.Item>)
+            that.setState({
+                groups: (<Menu onClick={that.handleMenuClick} className='menu'>
+                            {buffer}
+                        </Menu>),
+                content: (
+                    <div>
+                        <p className='choose' onClick={this.personSetting}>个人设置</p>
+                        <p className='choose'>退出登录</p>
+                    </div>
+                )
+            })
+            localStorage.setItem('token', res.data.data.token)
         })
-        buffer.push(<Menu.Divider></Menu.Divider>)
-        buffer.push(<Menu.Item key='add' ><PlusCircleOutlined />新建组</Menu.Item>)
-        this.setState({
-            groups: (<Menu onClick={this.handleMenuClick} className='menu'>
-                        {buffer}
-                    </Menu>),
-            content: (
-                <div>
-                    <p className='choose'>修改密码</p>
-                    <p className='choose'>退出登录</p>
-                </div>
-            )
-        })
+       
     }
 
     

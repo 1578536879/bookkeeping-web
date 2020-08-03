@@ -1,7 +1,7 @@
 import React, { Component } from "react"
 import {Form, Input, message, Button} from 'antd'
 import commonData  from '../../common/DATA'
-import {createGroup} from '../../interface/userGroup'
+import {createGroup} from '../../interface/group'
 
 class CreateGroupComponent extends Component{
     constructor(props){
@@ -17,6 +17,7 @@ class CreateGroupComponent extends Component{
         }).then(res=>{
             if(res.data.code === commonData.CODE.SUCCESS){
                 message.success('创建成功!')
+                localStorage.setItem('token', res.data.data.token)
             }else{
                 message.error(res.data.msg)
             }

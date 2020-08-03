@@ -2,12 +2,11 @@ import Axios from 'axios'
 import enviornment from '../common/enviornment'
 import qs from 'qs'
 
-export let createGroup = function(data){
+export let getUserCreateGroup = function(data){
     return Axios({
-        method: 'post',
-        url: `http://${enviornment.hostname}:${enviornment.port}/group/createGroup`,
+        method: 'get',
+        url: `http://${enviornment.hostname}:${enviornment.port}/group/user/getGroups`,
         data: qs.stringify({
-            name: data.name,
         }),
         headers: {
             'content-type': 'application/x-www-form-urlencoded',
@@ -15,7 +14,3 @@ export let createGroup = function(data){
         },
     })
 }
-
-// module.exports = {
-//     createGroup: createGroup
-// }

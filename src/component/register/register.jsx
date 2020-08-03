@@ -6,7 +6,7 @@ import Axios from 'axios'
 import qs from 'qs'
 import commonData from '../../common/DATA'
 import enviorment from '../../common/enviornment'
-import md5 from 'js-md5'
+import {register} from '../../interface/user'
 
 export default class Register extends Component{
     constructor(props){
@@ -74,32 +74,21 @@ export default class Register extends Component{
         })
     }
 
-    register(){
+    onFinish(){
         console.log(this.state)
         let password = this.refs.password.props.value || this.refs.password.state.value
-        let pos = Math.floor(Math.random()*password.length)
-        password = password.substr(0, pos) + md5('BookKeeping') + password.substr(pos, password.length - pos)
-        password = btoa(password)
         this.setState({
             password: password,
-            email: this.refs.email.props.value || this.refs.email.state.value,
-            username: this.refs.username.props.value || this.refs.username.state.value,
-            code: this.refs.code.props.value || this.refs.code.state.value
+            email: that.refs.email.props.value || that.refs.email.state.value,
+            username: that.refs.username.props.value || that.refs.username.state.value,
+            code: that.refs.code.props.value || that.refs.code.state.value
         })
         let that = this
-        Axios({
-            method: 'post',
-            url: `http://${enviorment.hostname}:${enviorment.port}/register`,
-            data: qs.stringify({
-                email: that.state.email,
-                password: that.state.password,
-                username: that.state.username,
-                code: that.state.code,
-                pos: pos
-            }),
-            headers: {
-                'content-type': 'application/x-www-form-urlencoded',
-            },
+        register({
+            email: that.state.email,
+            password: that.state.password,
+            username: that.state.username,
+            code: that.state.code,
         }).then(res=>{
             console.log(res)
             if(res.data.code === commonData.CODE.SUCCESS){
@@ -112,7 +101,7 @@ export default class Register extends Component{
 
     render(){
         return (
-            <Form className='register' style={{margin: 'auto'}} onFinish={this.register} >
+            <Form className='register' style={{margin: 'auto'}} onFinish={this.onFinish} >
                 <Form.Item name='email' rules={[{
                     required: true,
                     pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
