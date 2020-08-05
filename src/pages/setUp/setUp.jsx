@@ -213,8 +213,8 @@ class setUp extends Component{
 
     render(){
         return (
-            <div>
-                <Row className='row'  style={{marginBottom: '10%', paddingLeft:' 10px'}}>
+            <div style={{paddingTop: '3%'}}>
+                <Row className='row'  style={{marginBottom: '6%', paddingLeft:' 10px'}}>
                     <Col span={12}>
                         当前密码：******
                     </Col>

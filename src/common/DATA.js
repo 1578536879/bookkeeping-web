@@ -26,6 +26,15 @@ module.exports = {
             title: '组名',
             dataIndex: 'name',
             key: 'name'
+        }],
+        GROUPMEMBER: [{
+            title: '用户名',
+            dataIndex: 'name',
+            key: 'name'
+        },{
+            title: '用户邮箱',
+            dataIndex: 'email',
+            key: 'email'
         }]
     }
 }

@@ -1,0 +1,13 @@
+.add-col{
+    height: 35px;
+}
+
+.deleteMember{
+    color: red;
+    cursor: pointer;
+}
+
+.administrator{
+    color: #1890FF;
+    cursor: pointer;
+}
