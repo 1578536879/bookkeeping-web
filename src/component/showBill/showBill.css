@@ -12,3 +12,8 @@
 .table-col{
     margin: auto;
 }
+
+.delete{
+    color: red;
+    cursor: pointer;
+}
