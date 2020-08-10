@@ -1,0 +1,11 @@
+.form{
+    width: 80%;
+    max-width: 450px;
+    height: 210px;
+    margin: auto;
+    background: white;
+    padding: 20px;
+    padding-top: 4%;
+    transform: translateY(50%);
+    border-radius: 5px;
+}

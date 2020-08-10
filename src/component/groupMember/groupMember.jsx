@@ -1,9 +1,9 @@
 import React, {Component} from 'react'
-import {Table, Tag, Col, Button, Modal, Form, Input} from 'antd'
+import {Table, Tag, Col, Button, Modal, Form, Input, message} from 'antd'
 import { PlusOutlined,} from '@ant-design/icons'
-
 import './groupMember.css'
 import commonData from '../../common/DATA'
+import {inviteUser} from '../../interface/userGroup'
 
 class groupMember extends Component{
     constructor(props){
@@ -28,6 +28,7 @@ class groupMember extends Component{
         }
         this.addMember = this.addMember.bind(this)
         this.close = this.close.bind(this)
+        this.onFinish = this.onFinish.bind(this)
     }
 
     componentDidMount(){
@@ -106,14 +107,31 @@ class groupMember extends Component{
         console.log(this.state.modalVisible)
     }
 
-    onFinish(){
-
+    onFinish(){        
+        let that = this
+        console.log(that.refs)
+        let email = that.refs.email.props.value || that.refs.email.state.value
+        let parn = /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/
+        if(!parn.test(email)){
+            message.error('请输入合法的电子邮箱')
+            return 
+        }
+        inviteUser({
+            email: email,
+            token: localStorage.getItem('token')
+        }).then(res=>{
+            if(res.data.code === commonData.CODE.SUCCESS){
+                message.success(res.data.msg)
+            }else{
+                message.error(res.data.msg)
+            }
+        })
     }
 
     render(){
         return (
             // eslint-disable-next-line react/react-in-jsx-scope
-           <div>
+           <div style={{marginTop: '5%'}}>
                <Col span={22} className='add-col'>
                     <Button type='primary' icon={<PlusOutlined />} onClick={this.addMember}>邀请新组员</Button>
                 </Col>
@@ -127,7 +145,7 @@ class groupMember extends Component{
                             pattern: /^[A-Za-z0-9\u4e00-\u9fa5]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
                             message: '邮箱格式错误'
                         }]} style={{width: '90%', margin: 'auto', marginBottom: '10px'}}>
-                            <Input value={this.state.content} placeholder='请输入被邀请组员邮箱'/>
+                            <Input ref='email' placeholder='请输入被邀请组员邮箱'/>
                         </Form.Item>
                         <Form.Item style={{width: '90%', margin: 'auto'}}>
                             <Button block type='primary' onClick={this.onFinish}>邀请组员</Button>
