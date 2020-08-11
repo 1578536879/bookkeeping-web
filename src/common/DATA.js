@@ -1,3 +1,4 @@
+const React = require('antd')
 /* eslint-disable react/react-in-jsx-scope */
 module.exports = {
     CODE: {
@@ -12,6 +13,12 @@ module.exports = {
         HOME: [{
             title: '账单内容',
             dataIndex: 'content'
+        },{
+            title: '账单类型',
+            dataIndex: 'type',
+            render: (type) =>(
+                type?'收入':'支出'
+            )
         },{
             title: '账单金额',
             dataIndex: 'price'

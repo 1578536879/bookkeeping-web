@@ -5,13 +5,14 @@ import { PlusOutlined,QuestionCircleOutlined } from '@ant-design/icons'
 import AddBill from '../../component/addBill/addBill'
 import commonData from '../../common/DATA'
 import {getUserBill, deleteUserBill} from '../../interface/userBill'
+import {getGroupBill, deleteGroupBill} from '../../interface/groupBill'
 import enviornment from '../../common/enviornment'
  
 class showBill extends Component{
     constructor(props){
         super(props)
         this.state = {
-            columns: commonData.TABLECOLUMS.HOME,
+            columns: [],
             modalVisible: false,
             data: [],
             image: {
@@ -25,54 +26,77 @@ class showBill extends Component{
 
     componentDidMount(){
         // eslint-disable-next-line react/no-direct-mutation-state
-        console.log(124321)
-        this.state.columns.push({
-            title: '账单操作',
-            dataIndex: 'action',
-            render: (action) =>(
-                <span>
-                    {action.imagePath && <span className='other' onClick={this.picture.bind(this, action.imagePath)}>查看账单图片</span>}
-                    &nbsp;&nbsp;
-                    <Popconfirm title="确认删除此账单？" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}  onConfirm={this.delete.bind(this,action.BID)}>
-                        <span className='delete'>删除</span>
-                    </Popconfirm>
-                    
-                </span>
-            )
-        })
-        console.log(localStorage.getItem('group') === 'person')
+        console.log(this.state.columns.length, commonData.TABLECOLUMS.HOME.length)
         let that = this
+        commonData.TABLECOLUMS.HOME.forEach(ele=>{
+            this.state.columns.push(ele)
+        })
+        if(this.state.columns.length === commonData.TABLECOLUMS.HOME.length){
+            this.state.columns.push({
+                title: '账单操作',
+                dataIndex: 'action',
+                render: (action) =>(
+                    <span>
+                        {action.imagePath !== 'http://' + enviornment.hostname + ':' + enviornment.port + '/' && <span className='other' onClick={this.picture.bind(this, action.imagePath)}>查看账单图片</span>}
+                        &nbsp;&nbsp;
+                        <Popconfirm title="确认删除此账单？" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}  onConfirm={this.delete.bind(this,action)}>
+                            <span className='delete'>删除</span>
+                        </Popconfirm>
+                        
+                    </span>
+                )
+            })
+        }
+        
         if(localStorage.getItem('group') === 'person'){
             getUserBill({
                 token: localStorage.getItem('token')
             }).then(res=>{
-                console.log(res.data.data.data)
                 if(res.data.code === commonData.CODE.SUCCESS){
                     let data = []
-                    
                     res.data.data.data.forEach(ele=>{
                         data.push({
                             ...ele,
                             date: new Date(parseInt(ele.date)).toLocaleString(),
-                            
+                            name: ele.recorder,
                             action: {
                                 imagePath: 'http://' + enviornment.hostname + ':' + enviornment.port + '/' + ele.imagePath,
                                 BID: ele.BID
                             }
                         })
                     })
-                    console.log(data)
                     that.setState({
                         data: data
                     })
                 }else{
                     message.error(res.data.msg)
                 }
-                
+            })
+        }else{
+            getGroupBill({
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code === commonData.CODE.SUCCESS){
+                    let data = []
+                    res.data.data.data.forEach(ele=>{
+                        data.push({
+                            ...ele,
+                            date: new Date(parseInt(ele.date)).toLocaleString(),
+                            action: {
+                                imagePath: 'http://' + enviornment.hostname + ':' + enviornment.port + '/' + ele.imagePath,
+                                BID: ele.BID
+                            },
+                            name: ele.recorder
+                        })
+                    })
+                    that.setState({
+                        data: data
+                    })
+                }else{
+                    message.error(res.data.msg)
+                }
             })
         }
-        
-       
     }
 
     picture = (e) => {
@@ -91,23 +115,46 @@ class showBill extends Component{
     delete = (e) => {
         console.log(e)
         let that = this
-        deleteUserBill({
-            BID: e,
-            token: localStorage.getItem('token')
-        }).then(res=>{
-            if(res.data.code === commonData.CODE.SUCCESS){
-                message.success('删除账单成功√')
-                let data = that.state.data.filter(ele=>{
-                    return ele.BID !== e
-                })
-                that.setState({
-                    data: data
-                })
-                localStorage.setItem('token', res.data.msg)
-            }else{
-                message.error(res.data.msg)
-            }
-        })
+        if(localStorage.getItem('group') === 'person'){
+            deleteUserBill({
+                BID: e.BID,
+                path: e.imagePath,
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code === commonData.CODE.SUCCESS){
+                    message.success('删除账单成功√')
+                    let data = that.state.data.filter(ele=>{
+                        return ele.BID !== e.BID
+                    })
+                    that.setState({
+                        data: data
+                    })
+                    localStorage.setItem('token', res.data.data.token)
+                }else{
+                    message.error(res.data.msg)
+                }
+            })
+        }else{
+            deleteGroupBill({
+                BID: e.BID,
+                path: e.imagePath,
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code === commonData.CODE.SUCCESS){
+                    message.success('删除账单成功√')
+                    let data = that.state.data.filter(ele=>{
+                        return ele.BID !== e.BID
+                    })
+                    that.setState({
+                        data: data
+                    })
+                    localStorage.setItem('token', res.data.data.token)
+                }else{
+                    message.error(res.data.msg)
+                }
+            })
+        }
+        
     }
 
     addBK = () => {
@@ -128,9 +175,14 @@ class showBill extends Component{
         })
     }
 
-    onFinish(){
+    onFinish(data){
+        console.log(data)
+        let d = this.state.data
+        d.push(data)
+        console.log(d)
         this.setState({
-            modalVisible: false
+            modalVisible: false,
+            data: d
         })
     }
 

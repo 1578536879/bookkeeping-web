@@ -2,6 +2,7 @@ import React, { Component } from "react"
 import {Form, Input, InputNumber, DatePicker, Button, Radio, message, Upload} from 'antd'
 import {UploadOutlined } from '@ant-design/icons'
 import {insertUserBill} from '../../interface/userBill'
+import {insertGroupBill} from '../../interface/groupBill'
 import commonData from '../../common/DATA'
 import {updateBillImage, deleteBillImage} from '../../interface/image'
 import enviornment from '../../common/enviornment'
@@ -57,23 +58,67 @@ class AddBill extends Component{
             message.warning('请填写账单内容！')
             return
         }
-        let path = this.state.fileList[0].path || ''
-        insertUserBill({
-            type: that.state.type,
-            content: that.state.content,
-            date: that.state.date,
-            price: that.state.price,
-            path: path,
-            token: localStorage.getItem('token')
-        }).then(res=>{
-            if(res.data.code === commonData.CODE.SUCCESS){
-                message.success('添加账单成功√')
-                localStorage.setItem('token', res.data.data.token)
-            }else{
-                message.error(res.data.msg)
-            }
-            that.props.addBill()
-        })
+        let path = ''
+        if(this.state.fileList[0]){
+            path = this.state.fileList[0].path
+        }
+        console.log(that.state)
+        if(localStorage.getItem('group') === 'person'){
+            insertUserBill({
+                type: that.state.type,
+                content: that.state.content,
+                date: that.state.date,
+                price: that.state.price,
+                path: path,
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code === commonData.CODE.SUCCESS){
+                    message.success('添加账单成功√')
+                    localStorage.setItem('token', res.data.data.token)
+                }else{
+                    message.error(res.data.msg)
+                }
+                that.props.addBill({
+                    type: that.state.type,
+                    content: that.state.content,
+                    date: that.state.date,
+                    price: that.state.price,
+                    action: {
+                        imagePath: path,
+                        BID: res.data.data.data.BID
+                    },
+                    name: res.data.data.data.name
+                })
+            })
+        }else{
+            insertGroupBill({
+                type: that.state.type,
+                content: that.state.content,
+                date: that.state.date,
+                price: that.state.price,
+                path: path,
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code === commonData.CODE.SUCCESS){
+                    message.success('添加账单成功√')
+                    localStorage.setItem('token', res.data.data.token)
+                }else{
+                    message.error(res.data.msg)
+                }
+                that.props.addBill({
+                    type: that.state.type,
+                    content: that.state.content,
+                    date: that.state.date,
+                    price: that.state.price,
+                    action: {
+                        imagePath: path,
+                        BID: res.data.data.data.BID
+                    },
+                    name: res.data.data.data.name
+                })
+            })
+        }
+        
     }
 
     updateBillImage = (file) => {
@@ -97,7 +142,6 @@ class AddBill extends Component{
                         path: res.data.data.path
                       }]
                 })
-                localStorage.setItem('token', res.data.data.token)
             }else{
                 message.error(res.data.msg)
             }

@@ -73,3 +73,16 @@ export let forgetPassword = function(data){
     })
 }
 
+export let switchGroup = function(data){
+    return Axios({
+        method: 'post',
+        url: `http://${enviornment.hostname}:${enviornment.port}/user/switchGroup`,
+        data: qs.stringify({
+            group: data.group
+        }),
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            'token': data.token
+        },
+    })
+}

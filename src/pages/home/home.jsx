@@ -5,6 +5,7 @@ import {DownOutlined, TeamOutlined, UserOutlined, PlusCircleOutlined, PieChartOu
 import CreateGroupComponent from '../../component/createGroup/createGroup'
 import ShowBill from '../../component/showBill/showBill'
 import {getUserCreateGroup} from '../../interface/userGroup'
+import {switchGroup} from '../../interface/user'
 import commonData from '../../common/DATA'
 import GroupMember from '../../component/groupMember/groupMember'
 import BillClassification from '../../component/billClassification/billClassification'
@@ -15,15 +16,19 @@ class Home extends Component{
         this.state = {
             userID: '12321342342314',
             groups: '',
-            onShow: '个人',
+            onShow: '',
             visible: false,
             createGroupVisible: false,
             content: '',            
             groups: [],
+            groupsData: [],
             menuKey: ['newBill'],
-            component: <BillClassification />
+            component: <ShowBill />
         }
         this.logout = this.logout.bind(this)
+        this.newBill = this.newBill.bind(this)
+        this.billClassification = this.billClassification.bind(this)
+        this.groupMember = this.groupMember.bind(this)
     }
 
     personSetting = ()=>{
@@ -41,10 +46,17 @@ class Home extends Component{
         }).then(res=>{
             console.log(res)
             if(res.data.code === commonData.CODE.SUCCESS){
+                let group = ''
                 res.data.data.groupsName.forEach((ele, index)=>{
                     // eslint-disable-next-line react/react-in-jsx-scope
+                    if(!ele.action.using){
+                        return 
+                    }
+                    if(ele.action.GID === res.data.data.GID){
+                        group = ele.name
+                    }
                     buffer.push(<Menu.Divider></Menu.Divider>)
-                    buffer.push(<Menu.Item key={ele.index} ><TeamOutlined />{ele.name}</Menu.Item>)
+                    buffer.push(<Menu.Item key={index} ><TeamOutlined />{ele.name}</Menu.Item>)
                     console.log(buffer)
                 })
                 buffer.push(<Menu.Divider></Menu.Divider>)
@@ -58,14 +70,49 @@ class Home extends Component{
                             <p className='choose' onClick={this.personSetting}>个人设置</p>
                             <p className='choose' onClick={this.logout}>退出登录</p>
                         </div>
-                    )
+                    ),
+                    groupsData: res.data.data.groupsName,
+                    onShow: group || '个人'
                 })
                 localStorage.setItem('token', res.data.data.token)
+                localStorage.setItem('group', group || 'person')
+            }else{
+                message.error(res.data.msg)
+                that.props.history.push('/')
+            }
+        })
+       
+    }
+
+    switch(data){
+        let that = this
+        switchGroup({
+            group: data,
+            token: localStorage.getItem('token')
+        }).then(res=>{
+            if(res.data.code === commonData.CODE.SUCCESS){
+                message.success('切换成功√')
+                localStorage.setItem('group', data)
+                localStorage.setItem('token', res.data.data.token)
+                console.log(that.state.menuKey)
+                if(that.state.menuKey[0] === 'newBill' || (data === 'person' && that.state.menuKey[0]  === 'groupMember')){
+                    that.setState({
+                        menuKey: ['newBill'],
+                        component: <ShowBill key={Math.random()}/>
+                    })
+                }else if(that.state.menuKey[0] === 'billClassification'){
+                    that.setState({
+                        component: <BillClassification key={Math.random()} />
+                    })
+                }else{
+                    that.setState({
+                        component: <GroupMember key={Math.random()}/>
+                    })
+                }
             }else{
                 message.error(res.data.msg)
             }
         })
-       
     }
 
     handleMenuClick = (e) => {
@@ -74,15 +121,19 @@ class Home extends Component{
             this.setState({
                 onShow: '个人'
             })
-        }else if(e.key === 'add'){
+            this.switch('person')
+        }else if(e.key === 'add'){  
             this.setState({
                 createGroupVisible: true
             })
         }else{
-            let groupName = this.state.groups[e.key]
+            console.log(parseInt(e.key), this.state.groupsData)
+            let groupName = this.state.groupsData[parseInt(e.key)]
+            console.log(groupName)
             this.setState({
-                onShow: groupName
+                onShow: groupName.name
             })
+            this.switch(groupName.action.GID)
         }
     }
 
@@ -121,6 +172,24 @@ class Home extends Component{
         })
     }
 
+    newBill(){
+        this.setState({
+            component: <ShowBill />
+        })
+    }
+
+    billClassification(){
+        this.setState({
+            component: <BillClassification />
+        })
+    }
+
+    groupMember(){
+        this.setState({
+            component: <GroupMember />
+        })
+    }
+
     render(){
         console.log(this.state.groups)
         return (
@@ -141,12 +210,10 @@ class Home extends Component{
                 <Row style={{height: '92%'}}>
                     <Col flex={1} style={{height: '100%', background: 'white', paddingTop: '3%'}}>
                     <Menu defaultSelectedKeys={this.state.menuKey} >
-                        <Menu.Item style={{height: '55px',
-    lineHeight: '55px'}} key='newBill'><PayCircleOutlined />最新账单</Menu.Item>
-                        <Menu.Item style={{height: '55px',
-    lineHeight: '55px'}}  key='billClassification'><PieChartOutlined  />账单归类</Menu.Item>
+                        <Menu.Item onClick={this.newBill} style={{height: '55px',lineHeight: '55px'}} key='newBill'><PayCircleOutlined />最新账单</Menu.Item>
+                        <Menu.Item onClick={this.billClassification} style={{height: '55px', lineHeight: '55px'}}  key='billClassification'><PieChartOutlined  />账单归类</Menu.Item>
                         {
-                            this.state.onShow !== '个人' && <Menu.Item key='groupMember'><TeamOutlined />查看组员</Menu.Item>
+                            this.state.onShow !== '个人' && <Menu.Item style={{height: '55px', lineHeight: '55px'}} key='groupMember' onClick={this.groupMember}><TeamOutlined />查看组员</Menu.Item>
                         }
                     </Menu>
                     </Col>

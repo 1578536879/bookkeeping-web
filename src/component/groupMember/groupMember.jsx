@@ -9,7 +9,7 @@ class groupMember extends Component{
     constructor(props){
         super(props)
         this.state = {
-            columns: commonData.TABLECOLUMS.GROUPMEMBER,
+            columns: [],
             member:[{
                 role: 'creator',
                 email: '1578536879@qq.com',
@@ -33,56 +33,62 @@ class groupMember extends Component{
 
     componentDidMount(){
         let role = this.state.role
+        let that = this
         console.log( this.state.columns)
-        this.state.columns.push({
-            title: '角色',
-            dataIndex: 'role',
-            key: 'role',
-            render: role => (
-                // eslint-disable-next-line react/react-in-jsx-scope
-                <>  
-                    {
-                        // eslint-disable-next-line react/react-in-jsx-scope
-                        role === 'creator' && <Tag color='green'>创建者</Tag>
-                    }{
-                        // eslint-disable-next-line react/react-in-jsx-scope
-                        role === 'administrator' && <Tag color='volcano'>管理员</Tag>
-                    }{
-                        // eslint-disable-next-line react/react-in-jsx-scope
-                        role === 'common' && <Tag color='geekblue'>组员</Tag>
-                    }
-                </>
-            )
-        },{
-            title: '操作',
-            dataIndex: 'action',
-            key: 'action',
-            render: action => (
-                // eslint-disable-next-line react/react-in-jsx-scope
-                <>
-                    {
-                        // eslint-disable-next-line react/react-in-jsx-scope
-                        role === 'creator' && action === 'common' && 
-                        <div>
-                            <span className='deleteMember'>删除</span> 
-                            <span> | </span>
-                            <span className='administrator'>设为管理员</span>
-                        </div>
-                    } {
-                        // eslint-disable-next-line react/react-in-jsx-scope
-                        role === 'creator' && action === 'administrator' &&
-                        <div>
-                            <span className='deleteMember'>删除</span> 
-                            <span> | </span>
-                            <span className='administrator'>取消管理员</span>
-                        </div>
-                    }{
-                        // eslint-disable-next-line react/react-in-jsx-scope
-                        role === 'administrator' && action === 'common' && <span className='deleteMember'>删除</span>
-                    }
-                </>
-            )
+        commonData.TABLECOLUMS.GROUPMEMBER.forEach(ele=>{
+            that.state.columns.push(ele)
         })
+        if(commonData.TABLECOLUMS.GROUPMEMBER.length === this.state.columns.length){
+            this.state.columns.push({
+                title: '角色',
+                dataIndex: 'role',
+                key: 'role',
+                render: role => (
+                    // eslint-disable-next-line react/react-in-jsx-scope
+                    <>  
+                        {
+                            // eslint-disable-next-line react/react-in-jsx-scope
+                            role === 'creator' && <Tag color='green'>创建者</Tag>
+                        }{
+                            // eslint-disable-next-line react/react-in-jsx-scope
+                            role === 'administrator' && <Tag color='volcano'>管理员</Tag>
+                        }{
+                            // eslint-disable-next-line react/react-in-jsx-scope
+                            role === 'common' && <Tag color='geekblue'>组员</Tag>
+                        }
+                    </>
+                )
+            },{
+                title: '操作',
+                dataIndex: 'action',
+                key: 'action',
+                render: action => (
+                    // eslint-disable-next-line react/react-in-jsx-scope
+                    <>
+                        {
+                            // eslint-disable-next-line react/react-in-jsx-scope
+                            role === 'creator' && action === 'common' && 
+                            <div>
+                                <span className='deleteMember'>删除</span> 
+                                <span> | </span>
+                                <span className='administrator'>设为管理员</span>
+                            </div>
+                        } {
+                            // eslint-disable-next-line react/react-in-jsx-scope
+                            role === 'creator' && action === 'administrator' &&
+                            <div>
+                                <span className='deleteMember'>删除</span> 
+                                <span> | </span>
+                                <span className='administrator'>取消管理员</span>
+                            </div>
+                        }{
+                            // eslint-disable-next-line react/react-in-jsx-scope
+                            role === 'administrator' && action === 'common' && <span className='deleteMember'>删除</span>
+                        }
+                    </>
+                )
+            })
+        }
         // this.state.member['action'] = this.state.member.map(a => {return a.role})
         this.state.member.forEach(ele=>{
             ele['action'] = ele.role
