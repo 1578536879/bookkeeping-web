@@ -3,26 +3,14 @@ import {Table, Tag, Col, Button, Modal, Form, Input, message} from 'antd'
 import { PlusOutlined,} from '@ant-design/icons'
 import './groupMember.css'
 import commonData from '../../common/DATA'
-import {inviteUser} from '../../interface/userGroup'
+import {inviteUser, getGroupMember, deleteMember, upgradeMember, downgradeMember} from '../../interface/userGroup'
 
 class groupMember extends Component{
     constructor(props){
         super(props)
         this.state = {
             columns: [],
-            member:[{
-                role: 'creator',
-                email: '1578536879@qq.com',
-                name: '123',
-            },{
-                role: 'common',
-                email: '1578536879@qq.com',
-                name: '123'
-            },{
-                role: 'administrator',
-                email: '1578536879@qq.com',
-                name: '123'
-            }],
+            member:[],
             role: 'creator',
             modalVisible: false,
         }
@@ -31,10 +19,9 @@ class groupMember extends Component{
         this.onFinish = this.onFinish.bind(this)
     }
 
-    componentDidMount(){
-        let role = this.state.role
+    table(){
+        let role = localStorage.getItem('role')
         let that = this
-        console.log( this.state.columns)
         commonData.TABLECOLUMS.GROUPMEMBER.forEach(ele=>{
             that.state.columns.push(ele)
         })
@@ -48,13 +35,13 @@ class groupMember extends Component{
                     <>  
                         {
                             // eslint-disable-next-line react/react-in-jsx-scope
-                            role === 'creator' && <Tag color='green'>创建者</Tag>
+                            role === commonData.ROLE.CREATOR && <Tag color='green'>创建者</Tag>
                         }{
                             // eslint-disable-next-line react/react-in-jsx-scope
-                            role === 'administrator' && <Tag color='volcano'>管理员</Tag>
+                            role === commonData.ROLE.ADMINISTRATION && <Tag color='volcano'>管理员</Tag>
                         }{
                             // eslint-disable-next-line react/react-in-jsx-scope
-                            role === 'common' && <Tag color='geekblue'>组员</Tag>
+                            role === commonData.ROLE.ORDINARY && <Tag color='geekblue'>组员</Tag>
                         }
                     </>
                 )
@@ -67,31 +54,50 @@ class groupMember extends Component{
                     <>
                         {
                             // eslint-disable-next-line react/react-in-jsx-scope
-                            role === 'creator' && action === 'common' && 
+                            role === commonData.ROLE.CREATOR && action.role === commonData.ROLE.ORDINARY && 
                             <div>
-                                <span className='deleteMember'>删除</span> 
+                                <span className='deleteMember' onClick={this.deleteMember.bind(this, action)}>删除</span> 
                                 <span> | </span>
-                                <span className='administrator'>设为管理员</span>
+                                <span className='administrator'  onClick={this.upgrade.bind(this, action)}>设为管理员</span>
                             </div>
                         } {
                             // eslint-disable-next-line react/react-in-jsx-scope
-                            role === 'creator' && action === 'administrator' &&
+                            role === commonData.ROLE.CREATOR && action.role === commonData.ROLE.ADMINISTRATION &&
                             <div>
-                                <span className='deleteMember'>删除</span> 
+                                <span className='deleteMember' onClick={this.deleteMember.bind(this, action)}>删除</span> 
                                 <span> | </span>
-                                <span className='administrator'>取消管理员</span>
+                                <span className='administrator'  onClick={this.Downgrade.bind(this, action)}>取消管理员</span>
                             </div>
                         }{
                             // eslint-disable-next-line react/react-in-jsx-scope
-                            role === 'administrator' && action === 'common' && <span className='deleteMember'>删除</span>
+                            role === commonData.ROLE.ADMINISTRATION && action.role === commonData.ROLE.ORDINARY && <span className='deleteMember'>删除</span>
                         }
                     </>
                 )
             })
         }
+    }
+
+    componentDidMount(){  
         // this.state.member['action'] = this.state.member.map(a => {return a.role})
-        this.state.member.forEach(ele=>{
-            ele['action'] = ele.role
+        this.table()
+        let that = this
+        getGroupMember({
+            token: localStorage.getItem('token')
+        }).then(res=>{
+            if(res.data.code === commonData.CODE.SUCCESS){
+                res.data.data.members.forEach(ele=>{
+                    ele['action'] = {
+                        role: ele.role,
+                        UID: ele.UID
+                    }
+                })
+                that.setState({
+                    member: res.data.data.members
+                })
+            }else{
+                message.error(res.data.msg)
+            }   
         })
         console.log(this.state.member)
     }
@@ -110,7 +116,94 @@ class groupMember extends Component{
         this.setState({
             modalVisible: true
         })
-        console.log(this.state.modalVisible)
+    }
+
+    deleteMember = (e) => {
+        let that = this
+        deleteMember({
+            token: localStorage.getItem('token'),
+            UID: e.UID
+        }).then(res=>{
+            if(res.data.code === commonData.CODE.SUCCESS){
+                let data = that.state.member.filter(ele=>{
+                    return ele.UID !== e.UID
+                })
+                that.setState({
+                    member: data
+                })
+                message.success('删除成功√')
+            }else{
+                message.error(res.data.msg)
+            }
+        })
+    }
+
+    upgrade = (e) => {
+        let that = this
+        upgradeMember({
+            token: localStorage.getItem('token'),
+            UID: e.UID
+        }).then(res=>{
+            if(res.data.code === commonData.CODE.SUCCESS){
+                let member = []
+                that.state.member.forEach(ele=>{
+                    console.log(ele.UID, e)
+                    if(ele.UID === e.UID){
+                        member.push({
+                            ...ele,
+                            role: commonData.ROLE.ADMINISTRATION,
+                            action: {
+                                UID: ele.UID,
+                                role: commonData.ROLE.ADMINISTRATION
+                            }
+                        })
+                    }else{
+                        member.push(ele)
+                    }
+                })
+                console.log(member)
+                that.setState({
+                    member: member
+                })
+                message.success(res.data.msg)
+            }else{
+                message.error(res.data.msg)
+            }
+        })
+    }
+
+    Downgrade = (e) => {
+        let that = this
+        downgradeMember({
+            token: localStorage.getItem('token'),
+            UID: e.UID
+        }).then(res=>{
+            if(res.data.code === commonData.CODE.SUCCESS){
+                let member = []
+                that.state.member.forEach(ele=>{
+                    console.log(ele.UID, e)
+                    if(ele.UID === e.UID){
+                        member.push({
+                            ...ele,
+                            role: commonData.ROLE.ORDINARY,
+                            action: {
+                                UID: ele.UID,
+                                role: commonData.ROLE.ORDINARY
+                            }
+                        })
+                    }else{
+                        member.push(ele)
+                    }
+                })
+                console.log(member)
+                that.setState({
+                    member: member
+                })
+                message.success(res.data.msg)
+            }else{
+                message.error(res.data.msg)
+            }
+        })
     }
 
     onFinish(){        
@@ -131,6 +224,9 @@ class groupMember extends Component{
             }else{
                 message.error(res.data.msg)
             }
+            that.setState({
+                modalVisible: false
+            })
         })
     }
 

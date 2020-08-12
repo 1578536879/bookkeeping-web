@@ -43,5 +43,10 @@ module.exports = {
             dataIndex: 'email',
             key: 'email'
         }]
+    },
+    ROLE: {
+        ORDINARY: 'ordinary',
+        CREATOR: 'creator',
+        ADMINISTRATION: 'administration'
     }
 }

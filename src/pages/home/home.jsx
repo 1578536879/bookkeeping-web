@@ -93,6 +93,7 @@ class Home extends Component{
             if(res.data.code === commonData.CODE.SUCCESS){
                 message.success('切换成功√')
                 localStorage.setItem('group', data)
+                localStorage.setItem('role', res.data.data.role)
                 localStorage.setItem('token', res.data.data.token)
                 console.log(that.state.menuKey)
                 if(that.state.menuKey[0] === 'newBill' || (data === 'person' && that.state.menuKey[0]  === 'groupMember')){
