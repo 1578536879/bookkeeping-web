@@ -21,6 +21,7 @@ class Home extends Component{
             createGroupVisible: false,
             content: '',            
             groups: [],
+            groupsItem: [],
             groupsData: [],
             menuKey: ['newBill'],
             component: <ShowBill />
@@ -59,11 +60,12 @@ class Home extends Component{
                     buffer.push(<Menu.Item key={index} ><TeamOutlined />{ele.name}</Menu.Item>)
                     console.log(buffer)
                 })
+                that.state.groupsItem = buffer
                 buffer.push(<Menu.Divider></Menu.Divider>)
                 buffer.push(<Menu.Item key='add' ><PlusCircleOutlined />新建组</Menu.Item>)
                 that.setState({
                     groups: (<Menu onClick={that.handleMenuClick} className='menu'>
-                                {buffer}
+                                {that.state.groupsItem}
                             </Menu>),
                     content: (
                         <div>
@@ -161,7 +163,25 @@ class Home extends Component{
         })
     }
 
-    onCreateGroupFinish = () =>{
+    onCreateGroupFinish = (data) =>{
+        if(data){
+            console.log(data)
+            let that = this
+            let item = this.state.groupsItem
+            let d = this.state.groupsData
+            item = item.slice(0, item.length - 3).concat(
+                <Menu.Item key={data.GID} ><TeamOutlined />{data.name}</Menu.Item>).concat(item.slice(item.length - 2, item.length))
+            
+            d.push(data)
+            this.setState({
+                groups: (<Menu onClick={that.handleMenuClick} className='menu'>
+                                {item}
+                            </Menu>),
+                groupsData: d,
+                groupsItem: item,
+                onShow: data.name
+            })
+        }
         this.setState({
             createGroupVisible: false
         })

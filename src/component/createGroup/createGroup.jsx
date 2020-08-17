@@ -15,13 +15,18 @@ class CreateGroupComponent extends Component{
             name: that.refs.groupName.props.value || that.refs.groupName.state.value,
             token: localStorage.getItem('token')
         }).then(res=>{
+            let d = ''
             if(res.data.code === commonData.CODE.SUCCESS){
                 message.success('创建成功!')
                 localStorage.setItem('token', res.data.data.token)
+                d = {
+                    name: that.refs.groupName.props.value || that.refs.groupName.state.value,
+                    GID: res.data.data.GID
+                }
             }else{
                 message.error(res.data.msg)
             }
-            that.props.onCreateGroupFinish()
+            that.props.onCreateGroupFinish(d)
         })
     }
 

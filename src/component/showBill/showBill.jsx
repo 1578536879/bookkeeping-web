@@ -19,7 +19,8 @@ class showBill extends Component{
                 path: '',
                 name: ''
             },
-            billVisible: false
+            billVisible: false,
+            role: ''
         }
         this.onFinish = this.onFinish.bind(this)
     }
@@ -31,6 +32,7 @@ class showBill extends Component{
         commonData.TABLECOLUMS.HOME.forEach(ele=>{
             this.state.columns.push(ele)
         })
+        let role = localStorage.getItem('role')
         if(this.state.columns.length === commonData.TABLECOLUMS.HOME.length){
             this.state.columns.push({
                 title: '账单操作',
@@ -39,15 +41,17 @@ class showBill extends Component{
                     <span>
                         {action.imagePath !== 'http://' + enviornment.hostname + ':' + enviornment.port + '/' && <span className='other' onClick={this.picture.bind(this, action.imagePath)}>查看账单图片</span>}
                         &nbsp;&nbsp;
-                        <Popconfirm title="确认删除此账单？" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}  onConfirm={this.delete.bind(this,action)}>
+                       {role !== commonData.ROLE.ORDINARY && <Popconfirm title="确认删除此账单？" icon={<QuestionCircleOutlined style={{ color: 'red' }} />}  onConfirm={this.delete.bind(this,action)}>
                             <span className='delete'>删除</span>
-                        </Popconfirm>
+                        </Popconfirm>}
                         
                     </span>
                 )
             })
         }
-        
+        this.setState({
+            role: role
+        })
         if(localStorage.getItem('group') === 'person'){
             getUserBill({
                 token: localStorage.getItem('token')
@@ -189,9 +193,9 @@ class showBill extends Component{
     render(){
         return (
             <div style={{marginTop: '5%'}}>
-                <Col span={22} className='add-col'>
+                {this.state.role !== commonData.ROLE.ORDINARY && <Col span={22} className='add-col'>
                     <Button type='primary' icon={<PlusOutlined />} onClick={this.addBK}>添加账单</Button>
-                </Col>
+                </Col>}
                 <Col span={22} className='table-col'>
                     <Table columns={this.state.columns} dataSource={this.state.data}>
                     </Table>

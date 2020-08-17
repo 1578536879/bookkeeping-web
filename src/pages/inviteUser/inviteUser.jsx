@@ -25,11 +25,11 @@ class inviteUser extends Component{
             token: localStorage.getItem('token')
         }).then(res=>{
             if(res.data.code === commonData.CODE.SUCCESS){
-                message.success('邀请成功√')
-                that.props.history.push('/')
+                message.success('加入组成功√')
             }else{
-                message.error(res.data.msg)
+                message.warning(res.data.msg)
             }
+            that.props.history.push('/')
         })
     }
 
