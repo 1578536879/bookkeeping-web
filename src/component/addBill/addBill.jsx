@@ -188,7 +188,7 @@ class AddBill extends Component{
         return(
             <Form onFinish={this.add}>
                 <Form.Item name='content' rules={[{
-                    required: true,
+                    required: true, 
                     message: '请输入账单内容'
                 }]} style={{width: '90%', margin: 'auto', marginBottom: '10px'}}>
                     <Input value={this.state.content} onChange={this.setConent} placeholder='账单内容'/>
@@ -201,7 +201,7 @@ class AddBill extends Component{
                         <Radio.Button value="out">支出</Radio.Button>
                         <Radio.Button value="in">收入</Radio.Button>
                     </Radio.Group>
-                    <InputNumber step={0.01} value={this.state.price} onChange={this.setPrice} placeholder='账单金额' style={{width: '70%'}} />
+                    <InputNumber step={0.01} min={0.00} value={this.state.price} onChange={this.setPrice} placeholder='账单金额' style={{width: '70%'}} />
                 </Form.Item>
                 <Form.Item name='date' style={{width: '90%', margin: 'auto', marginBottom: '10px'}} rules={[{
                     required: true,

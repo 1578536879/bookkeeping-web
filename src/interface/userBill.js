@@ -47,3 +47,19 @@ export let deleteUserBill = function(data){
         },
     })
 }
+
+export let userBillStatistics = function(data){
+    return Axios({
+        method: 'post',
+        url: `http://${enviornment.hostname}:${enviornment.port}/user/bill/statistics`,
+        data: qs.stringify({
+            time: data.data,
+            datePicker: data.datePicker
+        },
+        { indices: false }),
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            token: data.token
+        },
+    })
+}

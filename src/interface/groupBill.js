@@ -47,3 +47,19 @@ export let deleteGroupBill = function(data){
         },
     })
 }
+
+export let groupBillStatistics = function(data){
+    return Axios({
+        method: 'post',
+        url: `http://${enviornment.hostname}:${enviornment.port}/group/bill/statistics`,
+        data: qs.stringify({
+            time: data.data,
+            datePicker: data.datePicker
+        },
+        { indices: false }),
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            token: data.token
+        },
+    })
+}
