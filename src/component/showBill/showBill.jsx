@@ -1,13 +1,23 @@
 import React, {Component} from 'react'
 import './showBill.css'
-import { Row, Col, Table, Button, Modal, message, Popconfirm} from 'antd'
-import { PlusOutlined,QuestionCircleOutlined } from '@ant-design/icons'
+import {Row, DatePicker, Col, Table, Button, Modal, message, Popconfirm, Input, Select} from 'antd'
+import { PlusOutlined,QuestionCircleOutlined, AimOutlined } from '@ant-design/icons'
 import AddBill from '../../component/addBill/addBill'
 import commonData from '../../common/DATA'
-import {getUserBill, deleteUserBill} from '../../interface/userBill'
-import {getGroupBill, deleteGroupBill} from '../../interface/groupBill'
+import {getUserBill, deleteUserBill, findUserBill, queryUserBill} from '../../interface/userBill'
+import {getGroupBill, deleteGroupBill, findGroupBill, queryGroupBill} from '../../interface/groupBill'
 import enviornment from '../../common/enviornment'
- 
+import locale from 'antd/es/date-picker/locale/zh_CN';
+import moment from 'moment'
+const { RangePicker } = DatePicker 
+const { Search } = Input;
+const { Option } = Select
+moment.locale('en', {
+    week: {
+      dow: 1,
+    },
+  });
+
 class showBill extends Component{
     constructor(props){
         super(props)
@@ -20,9 +30,17 @@ class showBill extends Component{
                 name: ''
             },
             billVisible: false,
-            role: ''
+            role: '',
+            select: 'find',
+            name: '',
+            date: [],
+            skip: 0
         }
         this.onFinish = this.onFinish.bind(this)
+        this.setType = this.setType.bind(this)
+        this.setDate = this.setDate.bind(this)
+        this.search = this.search.bind(this)
+        this.query = this.query.bind(this)
     }
 
     componentDidMount(){
@@ -190,11 +208,168 @@ class showBill extends Component{
         })
     }
 
+    setType(e){
+        this.setState({
+            select: e
+        })
+    }
+
+    setDate(e, str){
+        console.log(e, str)
+        this.setState({
+            date: str
+        })
+    }
+
+    search(name){
+        let that = this
+        if(localStorage.getItem('group') === 'person'){
+            findUserBill({
+                name: name,
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code !== commonData.CODE.SUCCESS){
+                    message.error(res.data.msg)
+                }else{
+                    let data = []
+                    res.data.data.data.forEach(ele=>{
+                        data.push({
+                            ...ele,
+                            date: new Date(parseInt(ele.date)).toLocaleString(),
+                            name: ele.recorder,
+                            action: {
+                                imagePath: 'http://' + enviornment.hostname + ':' + enviornment.port + '/' + ele.imagePath,
+                                BID: ele.BID
+                            }
+                        })
+                    })
+                    that.setState({
+                        data: data
+                    })
+                }
+            })
+        }else{
+            findGroupBill({
+                name: name,
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code !== commonData.CODE.SUCCESS){
+                    message.error(res.data.msg)
+                }else{
+                    let data = []
+                    res.data.data.data.forEach(ele=>{
+                        data.push({
+                            ...ele,
+                            date: new Date(parseInt(ele.date)).toLocaleString(),
+                            name: ele.recorder,
+                            action: {
+                                imagePath: 'http://' + enviornment.hostname + ':' + enviornment.port + '/' + ele.imagePath,
+                                BID: ele.BID
+                            }
+                        })
+                    })
+                    that.setState({
+                        data: data
+                    })
+                }
+            })
+        }
+        
+    }
+
+    query(){
+        let startTime = this.state.date[0]
+        let endTime = this.state.date[1]
+        startTime = new Date(startTime).getTime()
+        endTime = new Date(endTime).getTime()
+        let that = this
+        if(localStorage.getItem('group') === 'person'){
+            queryUserBill({
+                startTime: startTime,
+                endTime: endTime,
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code !== commonData.CODE.SUCCESS){
+                    message.error(res.data.msg)
+                }else{
+                    let data = []
+                    res.data.data.data.forEach(ele=>{
+                        data.push({
+                            ...ele,
+                            date: new Date(parseInt(ele.date)).toLocaleString(),
+                            name: ele.recorder,
+                            action: {
+                                imagePath: 'http://' + enviornment.hostname + ':' + enviornment.port + '/' + ele.imagePath,
+                                BID: ele.BID
+                            }
+                        })
+                    })
+                    that.setState({
+                        data: data
+                    })
+    
+                }
+            })
+        }else{
+            queryGroupBill({
+                startTime: startTime,
+                endTime: endTime,
+                token: localStorage.getItem('token')
+            }).then(res=>{
+                if(res.data.code !== commonData.CODE.SUCCESS){
+                    message.error(res.data.msg)
+                }else{
+                    let data = []
+                    res.data.data.data.forEach(ele=>{
+                        data.push({
+                            ...ele,
+                            date: new Date(parseInt(ele.date)).toLocaleString(),
+                            name: ele.recorder,
+                            action: {
+                                imagePath: 'http://' + enviornment.hostname + ':' + enviornment.port + '/' + ele.imagePath,
+                                BID: ele.BID
+                            }
+                        })
+                    })
+                    that.setState({
+                        data: data
+                    })
+    
+                }
+            })
+        }
+        
+    }
+
     render(){
         return (
             <div style={{marginTop: '5%'}}>
-                {this.state.role !== commonData.ROLE.ORDINARY && <Col span={22} className='add-col'>
-                    <Button type='primary' icon={<PlusOutlined />} onClick={this.addBK}>添加账单</Button>
+                {this.state.role !== commonData.ROLE.ORDINARY && 
+                <Col span={22} className='add-col'>
+                    <Row>
+                        <Col span={4}>
+                            <Select value={this.state.select} onChange={this.setType}>
+                                <Option value="find">查找账单</Option>
+                                <Option value="query">查询账单</Option>
+                            </Select>
+                        </Col>
+                        <Col span={15}>
+                        {
+                            this.state.select === 'find' &&
+                            <Search placeholder="输入账单名称" onSearch={this.search} enterButton />
+                        }
+                        {
+                            this.state.select === 'query' &&
+                            <div>
+                                <RangePicker onChange={this.setDate} locale={locale}/>
+                                <Button style={{display: 'inline', marginLeft: '5%'}} icon={<AimOutlined />} onClick={this.query}>查询账单</Button>
+                            </div>
+                        }
+                        </Col>
+                        <Col span={5}>
+                            <Button type='primary' icon={<PlusOutlined />} onClick={this.addBK}>添加账单</Button>
+                        </Col>
+                    </Row>
                 </Col>}
                 <Col span={22} className='table-col'>
                     <Table columns={this.state.columns} dataSource={this.state.data}>

@@ -63,3 +63,32 @@ export let userBillStatistics = function(data){
         },
     })
 }
+
+export let findUserBill = function(data){
+    return Axios({
+        method: 'post',
+        url: `http://${enviornment.hostname}:${enviornment.port}/user/bill/find`,
+        data: qs.stringify({
+            name: data.name
+        }),
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            token: data.token
+        },
+    })
+}
+
+export let queryUserBill = function(data){
+    return Axios({
+        method: 'post',
+        url: `http://${enviornment.hostname}:${enviornment.port}/user/bill/query`,
+        data: qs.stringify({
+            startTime: data.startTime,
+            endTime: data.endTime,
+        }),
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            token: data.token
+        },
+    })
+}

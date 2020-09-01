@@ -63,3 +63,32 @@ export let groupBillStatistics = function(data){
         },
     })
 }
+
+export let findGroupBill = function(data){
+    return Axios({
+        method: 'post',
+        url: `http://${enviornment.hostname}:${enviornment.port}/group/bill/find`,
+        data: qs.stringify({
+            name: data.name
+        }),
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            token: data.token
+        },
+    })
+}
+
+export let queryGroupBill = function(data){
+    return Axios({
+        method: 'post',
+        url: `http://${enviornment.hostname}:${enviornment.port}/group/bill/query`,
+        data: qs.stringify({
+            startTime: data.startTime,
+            endTime: data.endTime,
+        }),
+        headers: {
+            'content-type': 'application/x-www-form-urlencoded',
+            token: data.token
+        },
+    })
+}

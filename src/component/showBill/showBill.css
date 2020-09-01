@@ -1,12 +1,12 @@
 .add-col{
+    margin: auto;
     margin-bottom: 10px;
-    height: 35px;
+    /* height: 35px; */
 }
 
 .add-col button{
-    float: right;
-    height: 35px;
-    margin-bottom: 15px;
+    margin: auto;
+    display: block;
 }
 
 .table-col{
