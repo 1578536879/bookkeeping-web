@@ -7,6 +7,7 @@ import {userBillStatistics} from '../../interface/userBill'
 import commonData from '../../common/DATA'
 import locale from 'antd/es/date-picker/locale/zh_CN';
 import moment from 'moment'
+import dayWeek from 'day-week'
 const Option = Select
 moment.locale('en', {
     week: {
@@ -122,42 +123,12 @@ class billClassification extends Component{
             let index = str.indexOf('-')
             let week = str.slice(index+1, str.length)
             week = parseInt(week)
-            weekEng.forEach(ele=>{
-                let day = moment().day(ele).year(year).week(week).toDate()
-                let date = new Date(`${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`)
-                xAxis.push(`${day.getFullYear()}-${day.getMonth() + 1}-${day.getDate()}`)
-                timeArr.push(date.getTime())
-            })
-            let lastDay = new Date(timeArr[timeArr.length-1])
-            lastDay = lastDay.setDate(lastDay.getDate()+1)
-            timeArr.push(lastDay)
+            timeArr = dayWeek.weekToDay(`${year}-${week}`)
         }else if(this.state.datePicker === 'month'){
             let year = parseInt(str)
             let index = str.indexOf('-')
             let mouth = str.slice(index+1, str.length)
-            mouth = parseInt(mouth)
-            let num = 1
-            let day = new Date(`${year}-${mouth}-${num}`)
-            timeArr.push(day.getTime())
-            xAxis.push(new Date(`${year}-${mouth}-${num}`))
-            let week = moment(day.getTime()).day()
-            if(week%7 !== 1){
-                num += (7 - week + 1)
-            }else{
-                num += 7
-            }
-            let lastday = new Date(day.setDate(0))
-            lastday = lastday.getDate()
-            for(let i=0;i<parseInt(lastday/7);i++){
-                day = new Date(`${year}-${mouth}-${num}`)
-                timeArr.push(day.getTime())
-                xAxis.push(new Date(`${year}-${mouth}-${num}`))
-                num += 7
-            }
-            console.log(lastday)
-            day = new Date(`${year}-${mouth}-${lastday}`)
-            day = day.setDate(day.getDate()+1)
-            timeArr.push(day)
+            timeArr = dayWeek.monthToWeek(`${year}-${mouth}`)
         }else if(this.state.datePicker === 'year'){
             let year = parseInt(str)
             for(let i=0;i<12;i++){
