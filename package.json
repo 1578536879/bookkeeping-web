@@ -1,7 +1,10 @@
 {
-  "name": "bookkeeping-web",
+  "name": "<%=private%>",
   "version": "0.1.0",
-  "private": true,
+  "private": "<%=private%>",
+    "autor":"<%=author%>",
+  "description": "<%=description%>",
+    "license": "<%=license%>"
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.3.2",
